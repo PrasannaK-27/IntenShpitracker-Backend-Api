@@ -1,6 +1,8 @@
 package com.Backend.JobTracker.Controller;
 
+import com.Backend.JobTracker.DTO.JobDTO;
 import com.Backend.JobTracker.Entity.Jobs;
+import com.Backend.JobTracker.Repository.JobRepo;
 import com.Backend.JobTracker.Service.JobService;
 import com.Backend.JobTracker.Service.JobStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,64 +35,35 @@ public class JobController {
     public JobStatus jobStatusService;
 
     //View end Point..!!
-    @GetMapping("resume/view/{fileName}")
-    public ResponseEntity<Resource> viewResume(@PathVariable String fileName){
-        Path path = Paths.get("uploads").resolve(fileName);
 
-        try {
-            Resource resource =
-                    new UrlResource(path.toUri());
-            return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF)
-                    .header(
-                            HttpHeaders.CONTENT_DISPOSITION,
-                            "inline; filename=\"" + fileName + "\""
-                    )
-                    .body(resource);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+    @GetMapping("resume/view/{filename}")
+    public ResponseEntity<byte[]> viewResume(@PathVariable String filename){
+        return jobService.getResumeByFileName(filename);
     }
 
     //Download end Point..!!
     @GetMapping("resume/download/{fileName}")
-    public ResponseEntity<Resource> downloadResume(@PathVariable String fileName){
-        Path path = Paths.get("uploads").resolve(fileName);
-
-        try {
-            Resource resource =
-                    new UrlResource(path.toUri());
-            return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF)
-                    .header(
-                            HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"" + fileName + "\""
-                    )
-                    .body(resource);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+    public ResponseEntity<byte[]> downloadResume(@PathVariable String fileName){
+       return jobService.downloadResume(fileName);
     }
 
-    @GetMapping("/Jobs/{id}")
-    public ResponseEntity<Jobs> findById(@PathVariable Long id){
-        return ResponseEntity.ok(jobService.findByID(id));
-    }
-
-    @GetMapping("/Jobs")
-    public ResponseEntity<List<Jobs>> getAllJobs(){
-        return jobService.getAllJobs();
-    }
+//    @GetMapping("/Jobs")
+//    public ResponseEntity<List<Jobs>> getAllJobs(){
+//        return jobService.getAllJobs();
+//    }
 
     @GetMapping("/status")
     public ResponseEntity<Map<String ,Object>> getAllStatus(){
        return ResponseEntity.ok(jobStatusService.status());
    }
+
     @PatchMapping("Jobs/{id}")
     public ResponseEntity<Jobs> updatingExitingStatusById(@PathVariable Long id , @RequestBody Jobs job){
        return jobService.updatingExitingStatusById(id,job);
    }
 
     //handling Resume deletion...through fileName
-//  @CrossOrigin(origins = "http://localhost:5173")
+
     @PatchMapping("DelResumeUrl/{id}")
     public ResponseEntity<?> resumeUrlDel(@PathVariable Long id , @RequestParam String fileName){
         return jobService.resumeUrlDel(id ,fileName);
@@ -133,13 +106,30 @@ public class JobController {
         job.setApplyDate(ApplyDate);
         job.setStatus(Status);
         job.setNotes(Notes);
-        if(Resume != null && !Resume.isEmpty()){job.setResumeUrl(Resume.getOriginalFilename());}
-        return jobService.saveJob(job , Resume);
+        if(Resume != null && !Resume.isEmpty()){
+            job.setResumeUrl(Resume.getOriginalFilename());
+            try {
+                job.setPdfBytes(Resume.getBytes());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return jobService.saveJob(job);
     }
 
     @DeleteMapping("/Jobs/{id}")
     public ResponseEntity<?> deleteJobById(@PathVariable Long id){
         return jobService.deleteJobById(id);
+    }
+
+    @GetMapping("/JobsDTO")
+    public List<JobDTO> getAllJobsWithByteData(){
+        return jobService.getAllJobsWithByteData();
+    }
+
+    @GetMapping("/JobsDTO/{id}")
+    public ResponseEntity<JobDTO> findById(@PathVariable Long id){
+        return ResponseEntity.ok(jobService.findByID(id));
     }
 
 }

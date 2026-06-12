@@ -13,22 +13,22 @@ import java.nio.file.Paths;
 public class JobTrackerApplication {
 
 	public static void main(String[] args) {
-		createUploadFolder();
+//		createUploadFolder();
 		SpringApplication.run(JobTrackerApplication.class, args);
 	}
 
-	static void createUploadFolder() {
-		try {
-			Path uploadDir = Paths.get("uploads");
-			if (!Files.exists(uploadDir)) {
-				Files.createDirectories(uploadDir);
-				System.out.println("uploads/ folder created ✅");
-			} else {
-				System.out.println("uploads/ folder already exists ✅");
-			}
-		} catch (Exception e) {
-			System.out.println("Failed to create uploads/ folder: " + e.getMessage());
-		}
-	}
+//	static void createUploadFolder() {
+//		try {
+//			Path uploadDir = Paths.get("uploads");
+//			if (!Files.exists(uploadDir)) {
+//				Files.createDirectories(uploadDir);
+//				System.out.println("uploads/ folder created ✅");
+//			} else {
+//				System.out.println("uploads/ folder already exists ✅");
+//			}
+//		} catch (Exception e) {
+//			System.out.println("Failed to create uploads/ folder: " + e.getMessage());
+//		}
+//	}
 
 }

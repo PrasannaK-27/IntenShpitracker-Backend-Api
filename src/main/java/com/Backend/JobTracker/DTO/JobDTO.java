@@ -1,17 +1,18 @@
-package com.Backend.JobTracker.Entity;
+package com.Backend.JobTracker.DTO;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
-@Data
-@Entity
-@NoArgsConstructor
+
 @AllArgsConstructor
-public class Jobs {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) 
+@NoArgsConstructor
+@Data
+public class JobDTO {
     private Long id;
     private String CompanyName;
     private String Role;
@@ -20,13 +21,9 @@ public class Jobs {
     private String Notes;
     private String resumeUrl;
 
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    private byte[] pdfBytes;
-
     @Override
     public String toString() {
-        return "Jobs{" +
+        return "JobDTO{" +
                 "id=" + id +
                 ", CompanyName='" + CompanyName + '\'' +
                 ", Role='" + Role + '\'' +
@@ -36,4 +33,5 @@ public class Jobs {
                 ", resumeUrl='" + resumeUrl + '\'' +
                 '}';
     }
+
 }
